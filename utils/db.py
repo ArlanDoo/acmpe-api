@@ -22,10 +22,21 @@ class EventDB:
         except Exception as ex:
             return DBException(f"{ex}: Failed READ event")
     
+    def list(self) ->  str:
+        try:
+            return self._storage.list()
+        except Exception as ex:
+            return DBException(f"{ex}: Failed LIST event")
+            
+    
     def update(self, _id: str, event: Event) -> str:
         try:
             return self._storage.update(_id, event)
         except Exception as ex:
             return DBException(f"{ex}: Failed UPDATE event")
-    
-    
+        
+    def delete(self, _id: str) -> str:
+        try:
+            return self._storage.delete(_id)
+        except Exception as ex:
+            return DBException(f"{ex}: Failed DELETE event")

@@ -1,3 +1,4 @@
+from typing import List
 from models.event import Event
 from utils.valid_utils import len_more_then
 
@@ -24,8 +25,10 @@ class EventStorage:
     def read(self, _id: str) -> Event:
         if _id not in self._storage:
             return EventStorageException(f"Event {_id} is not found")
-        else:
-            return str(self._storage[_id])
+        return self._storage[_id]
+    
+    def list(self) -> List[Event]:
+        return list(self._storage.values())
     
     def update(self, _id: str, event: Event) -> Event:
         if _id not in self._storage:
@@ -33,3 +36,9 @@ class EventStorage:
         else:
             self._storage[_id] = event
             return f"Event {_id} is update"
+    
+    def delete(self, _id: str) -> Event:
+        if _id not in self._storage:
+            return EventStorageException(f"Event {_id} is not found")
+        else:
+            del self._storage[_id]
