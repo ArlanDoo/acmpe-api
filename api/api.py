@@ -8,14 +8,6 @@ import json
 app = Flask(__name__)
 event_storage = EventDB()
 
-class EventEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Event):
-            return obj.__dict__
-        return json.JSONEncoder.default(self, obj)
-
-app.json_encoder = EventEncoder
-
 @app.route(f"{MAIN_PATH_API}/event/create/", methods = ["POST"])
 def create():
     create_data = request.get_json()
@@ -24,15 +16,15 @@ def create():
                   create_data["title"],
                   create_data["description"])
     
-    return str(event_storage.create(event))
+    return jsonify(event_storage.create(event)), 201
 
 @app.route(f"{MAIN_PATH_API}/event/read/<_id_>/", methods = ["GET"])
 def read(_id_):
-    return str(event_storage.read(_id_))
+    return jsonify(event_storage.read(_id_)), 200
 
 @app.route(f"{MAIN_PATH_API}/event/list/", methods = ["GET"])
 def list():
-    return str(event_storage.list())
+    return event_storage.list()
 
 @app.route(f"{MAIN_PATH_API}/event/update/<_id_>/", methods = ["PUT"])
 def update(_id_):

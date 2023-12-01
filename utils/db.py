@@ -4,7 +4,11 @@ from models.event import Event
 eventstorage = EventStorage()
 
 class DBException(Exception):
-    pass
+    def __init__(self, message):
+        self.message = message
+    
+    def to_dict(self):
+        return {"Error": self.message}
 
 class EventDB:
     def __init__(self):
@@ -19,8 +23,9 @@ class EventDB:
     def read(self, _id: str) -> str:
         try:
             return self._storage.read(_id)
-        except Exception as ex:
-            return DBException(f"{ex}: Failed READ event")
+        except DBException as ex:
+            error = ex(f"{ex}: Failed READ event")
+            return ex.to_dict()
     
     def list(self) ->  str:
         try:
