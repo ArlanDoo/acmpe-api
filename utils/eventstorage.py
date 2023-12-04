@@ -1,6 +1,7 @@
 from typing import List
 from models.event import Event
 from utils.valid_utils import len_more_then
+import json
 
 class EventStorageException(Exception):
     def __init__(self, message):
@@ -18,9 +19,11 @@ class EventStorage:
         if len_more_then(event.title, 30):
             error = EventStorageException(f"Title length more then 30 symbol")
             return error.to_dict()
+        
         elif len_more_then(event.description, 200):
             error = EventStorageException(f"Description length more then 200 symbol")
             return error.to_dict()
+        
         else:
             self.counter += 1
             event.id = str(self.counter)
@@ -32,7 +35,15 @@ class EventStorage:
         if _id not in self._storage:
             error = EventStorageException(f"Event {_id} is not found")
             return error.to_dict()
-        return {"response": dict(self._storage[_id])}
+        
+        return {"response":
+                    {
+                        "id": self._storage[_id].id,
+                        "title": self._storage[_id].title,
+                        "date": self._storage[_id].date,
+                        "description": self._storage[_id].description
+                    }
+                }
     
     def list(self) -> List[Event]:
         return list(self._storage.values())
@@ -40,6 +51,7 @@ class EventStorage:
     def update(self, _id: str, event: Event) -> Event:
         if _id not in self._storage:
             return EventStorageException(f"Event {_id} is not found")
+        
         else:
             self._storage[_id] = event
             return f"Event {_id} is update"
@@ -47,5 +59,6 @@ class EventStorage:
     def delete(self, _id: str) -> Event:
         if _id not in self._storage:
             return EventStorageException(f"Event {_id} is not found")
+        
         else:
             del self._storage[_id]
