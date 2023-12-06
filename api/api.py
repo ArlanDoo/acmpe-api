@@ -36,20 +36,13 @@ def read(_id_):
 
 @app.route(f"{MAIN_PATH_API}/event/list/", methods = ["GET"])
 def list():
-    pass
-    # try:
-    #     event_list = event_storage.list()
-    #     return jsonify({
-    #         "response": [
-    #             for event from event_list:
-    #                 return {}
-    #         ]
-    #     })
+    try:
+        return jsonify(event_storage.list())
     
-    # except Exception as ex:
-    #     return jsonify({
-    #         "error": f"Excpt: {ex}. Failed list note"
-    #     }), 404
+    except Exception as ex:
+        return jsonify({
+            "error": f"Excpt: {ex}. Failed list note"
+        }), 404
 
 @app.route(f"{MAIN_PATH_API}/event/update/<_id_>/", methods = ["PUT"])
 def update(_id_):

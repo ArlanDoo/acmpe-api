@@ -1,8 +1,9 @@
 from typing import List
 from models.event import Event
 from utils.valid_utils import len_more_then
-import json
+from datetime import datetime
 
+import json
 class EventStorageException(Exception):
     def __init__(self, message):
         self.message = message
@@ -10,10 +11,15 @@ class EventStorageException(Exception):
     def to_dict(self):
         return {"Error": self.message}
 
+class EventEncoder(json.JSONEncoder):
+    def default(self, o):
+        return o.__dict__
+
 class EventStorage:
     def __init__(self):
         self.counter = 0
         self._storage = {}
+        self.l_time_add = datetime.now()
     
     def create(self, event: Event) -> str:
         if len_more_then(event.title, 30):
@@ -36,17 +42,24 @@ class EventStorage:
             error = EventStorageException(f"Event {_id} is not found")
             return error.to_dict()
         
-        return {"response":
-                    {
-                        "id": self._storage[_id].id,
-                        "title": self._storage[_id].title,
-                        "date": self._storage[_id].date,
-                        "description": self._storage[_id].description
-                    }
-                }
+        # return {"response":
+        #             {
+        #                 "id": self._storage[_id].id,
+        #                 "title": self._storage[_id].title,
+        #                 "date": self._storage[_id].date,
+        #                 "description": self._storage[_id].description
+        #             }
+        #         }
+        return {"event": json.dumps(self._storage[_id], cls=EventEncoder)}
     
     def list(self) -> List[Event]:
-        return list(self._storage.values())
+        # return json.dumps(list(self._storage.values()))
+        if not len(self._storage):
+            error = EventStorageException(f"Event {_id} is not found")
+            return error.to_dict()
+        return {
+            "event_list": json.dumps(list(self._storage.values()), cls=EventEncoder)
+        }
     
     def update(self, _id: str, event: Event) -> Event:
         if _id not in self._storage:

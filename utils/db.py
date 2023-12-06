@@ -17,31 +17,37 @@ class EventDB:
     def create(self, event: Event) -> str:
         try:
             return self._storage.create(event)
+        
         except Exception as ex:
             return DBException(f"{ex}: Failed CREATE event")
     
     def read(self, _id: str) -> str:
         try:
             return self._storage.read(_id)
+        
         except DBException as ex:
             error = ex(f"{ex}: Failed READ event")
-            return ex.to_dict()
+            return error.to_dict()
     
     def list(self) ->  str:
         try:
             return self._storage.list()
+        
         except Exception as ex:
-            return DBException(f"{ex}: Failed LIST event")
+            error = ex(f"{ex}: Failed READ event")
+            return ex.to_dict()
             
     
     def update(self, _id: str, event: Event) -> str:
         try:
             return self._storage.update(_id, event)
+        
         except Exception as ex:
             return DBException(f"{ex}: Failed UPDATE event")
         
     def delete(self, _id: str) -> str:
         try:
             return self._storage.delete(_id)
+        
         except Exception as ex:
             return DBException(f"{ex}: Failed DELETE event")
