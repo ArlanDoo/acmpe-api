@@ -9,7 +9,7 @@ class EventStorageException(Exception):
         self.message = message
     
     def to_dict(self):
-        return {"Error": self.message}
+        return {"error": self.message}
 
 class EventEncoder(json.JSONEncoder):
     def default(self, o):
@@ -35,11 +35,14 @@ class EventStorage:
             event.id = str(self.counter)
             self._storage[event.id] = event
             
-            return {"response": f"Event {event.id} created"}
+            return {"result": f"Event {event.id} created"}
     
     def read(self, _id: str) -> Event:
-        if _id not in self._storage:
-            error = EventStorageException(f"Event {_id} is not found")
+        if not _id:
+            error = EventStorageException(f"Event number not found")
+            return error.to_dict() 
+        elif _id not in self._storage:
+            error = EventStorageException(f"Event {_id} not found")
             return error.to_dict()
         
         # return {"response":
@@ -55,23 +58,29 @@ class EventStorage:
     def list(self) -> List[Event]:
         # return json.dumps(list(self._storage.values()))
         if not len(self._storage):
-            error = EventStorageException(f"Event {_id} is not found")
+            error = EventStorageException(f"Events not found")
             return error.to_dict()
         return {
-            "event_list": json.dumps(list(self._storage.values()), cls=EventEncoder)
+            "list": json.dumps(list(self._storage.values()), cls=EventEncoder)
         }
     
     def update(self, _id: str, event: Event) -> Event:
         if _id not in self._storage:
-            return EventStorageException(f"Event {_id} is not found")
-        
+            error = EventStorageException(f"Event {_id} is not found")
+            return error.to_dict()
         else:
             self._storage[_id] = event
-            return f"Event {_id} is update"
+            return {
+                "update": f"Event {_id} is update"
+            }
     
     def delete(self, _id: str) -> Event:
         if _id not in self._storage:
-            return EventStorageException(f"Event {_id} is not found")
+            error = EventStorageException(f"Event {_id} is not found")
+            return error.to_dict()
         
         else:
             del self._storage[_id]
+            return {
+                "delete": f"Event {_id} is deleted"
+            }

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request
 from config.config import MAIN_PATH_API
 from models.event import Event
 from utils.db import EventDB
@@ -48,12 +48,12 @@ def list():
 def update(_id_):
     try:
         create_data = request.get_json()
-        event = Event(0,
+        event = Event(str(_id_),
                     create_data["date"],
                     create_data["title"],
                     create_data["description"])
         
-        return str(event_storage.update(_id_, event))
+        return jsonify(event_storage.update(_id_, event))
 
     except Exception as ex:
         return jsonify({
@@ -62,4 +62,10 @@ def update(_id_):
 
 @app.route(f"{MAIN_PATH_API}/event/delete/<_id_>/", methods = ["DELETE"])
 def delete(_id_):
-    return f"delete {_id_}"
+    try:
+        return jsonify(event_storage.delete(_id_))
+        
+    except Exception as ex:
+        return jsonify({
+            "error": f"Excpt: {ex}. Failed delete note"
+        }), 404
